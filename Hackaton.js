@@ -79,6 +79,7 @@ export default class Hackaton extends Component {
             <>
                <ScrollView 
                horizontal={true}
+               pagingEnabled={true}
                showsHorizontalScrollIndicator={true}
                ref = {(ref) => this.scroll = ref}
                >
