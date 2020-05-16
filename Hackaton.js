@@ -1,89 +1,143 @@
-import React, { Component } from 'react'
-import { View, Text, StyleSheet, ScrollView, FlatList, Dimensions, TouchableOpacity, Button } from 'react-native'
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faMobileAlt, faHome, faUserAlt } from '@fortawesome/free-solid-svg-icons'
+import React, { Component, version } from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  StatusBar,
+  ImageBackground,
+  TouchableOpacity,
+  Animated,
+  Dimensions,
+  ScrollView,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+  TextInput
+} from 'react-native';
 
-let screenWidth = Dimensions.get('window').width;
-let screenHeight = Dimensions.get('window').height;
+//import { LinearGradient } from 'expo-linear-gradient';
+import Input from './src/Components/Forms/InputHack';
+import Avatar from './src/Components/Forms/Avatar';
+import DatePicker from 'react-native-datepicker'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faUser, faEnvelope, faMobile, faCalendar, faEdit } from '@fortawesome/free-solid-svg-icons'
 
 const styles = StyleSheet.create({
-    containerSlider: {
+    container: {
+        position:'relative',
         flex: 1,
-        width: screenWidth,
+        backgroundColor: '#DCDEE1',
+        height: '100%'
+      },
+    header: {   
+        position:'absolute',
+        backgroundColor: '#cb60b3',
+        height: '35%',
+        width: '100%',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center' 
     },
-    menu:{
-        height: '8%',
-        flexDirection: 'row'
+    containerOptions: {
+        position:'absolute',
+        backgroundColor: '#FFFFFF',
+        height: '70%',
+        width: '90%',
+        marginTop: '40%',
+        marginLeft: '5%',
+        marginRight: '5%',
+        shadowColor: "#000",
+        shadowOpacity:  0.27,
+        shadowRadius: 4.65,
+        elevation: 6
     },
-    menuItems:{
-        flex: 1, 
-        backgroundColor: 'white',
-        borderTopColor: '#DDDDDD',
-        borderTopWidth: 1,
-        alignItems: 'center'
+    title: {
+        color: 'black',
+        textAlign: 'center',
+        fontSize: 20,
+        marginTop: '5%',
+        fontFamily: 'fantasy',
+        fontWeight: 'bold'
     },
-    menuIcons:{
-        alignItems: 'center',
-        marginTop: '4%'
+    contentIconEdit:{
+        flexDirection: 'row',
+        marginBottom: '2%'
+    }
+    ,
+    iconEdit:{
+        marginTop: '4%',
     }
 })
 
-const menu = [
-    {id: 1, title: 'Step 1'},
-    {id: 2, title: 'Step 2'},
-    {id: 3, title: 'Step 3'},
-]
+const image = { uri: "https://img.pngio.com/avatar-icon-png-105-images-in-collection-page-3-avatarpng-512_512.png" };
 
-export default class Hackaton extends Component {
+export default class App extends Component {
     constructor(props){
         super(props);
         this.state = {
-            postList: '',
-            tips: true,
-            home: false,
-            profile: false
+          typingNick: false,
+          user:'',
+          email:'',
+          phoneNumber:'',
+          date: '',
+          userName: 'Your nick',
+          editableNick: false
         }
-    }
+      }
 
-    scrollToOn = (index) => {
-         this.scroll.scrollTo({x: index * screenWidth, y: 0, animated: true})
-    }
+      focus = (value) => {
+        if(value === 'nick' ) {
+          this.setState({
+            typingNick: true
+          })
+        } 
+      } 
 
-    render(){
-        const { postList } = this.state;
-        return(
-            <>
-               <ScrollView 
-               horizontal={true}
-               showsHorizontalScrollIndicator={true}
-               ref = {(ref) => this.scroll = ref}
-               >
-               { <FlatList
-                    data={menu}
-                    renderItem={({item}) => (
-                        <>
-                        <Text  style={styles.containerSlider}>{item.title}</Text>
-                         </>
-                    )}
-                    keyExtractor={item => item.id}
-                    numColumns={1}
-                    horizontal={true}
-                /> }
-                </ScrollView>
-                <View style={styles.menu}>
-                <TouchableOpacity  onPress={() => this.scrollToOn(0)} style={styles.menuItems}>
-                    <View style={styles.menuIcons}><FontAwesomeIcon icon={ faMobileAlt } /><Text>TIPS</Text></View>
-                </TouchableOpacity>
-                <TouchableOpacity  onPress={() => this.scrollToOn(1)} style={styles.menuItems}>
-                    <View style={styles.menuIcons}><FontAwesomeIcon icon={ faHome } /><Text>HOME</Text></View>
-                </TouchableOpacity>
-                <TouchableOpacity  onPress={() => this.scrollToOn(2)} style={styles.menuItems}>
-                    <View style={styles.menuIcons}><FontAwesomeIcon icon={ faUserAlt } /><Text>PROFILE</Text></View>
-                </TouchableOpacity>
-                </View>
-            </>
-        )
-    }
+      _editNick = () => {
+          this.setState({
+            editableNick: true,
+            userName: '',            
+            typingNick: true
+          })
+      }
+render(){
+    const { user, email, phoneNumber, date, userName, editableNick } = this.state;
+
+    return (
+        <>
+        <View style={styles.container}>
+        <View style={styles.header}>
+            <Avatar image={image} />
+            <View style={styles.contentIconEdit}>
+                <TextInput value={userName} onChange={(userName) => this.setState({ userName})} editable={editableNick}
+                onFocusInput={() => this.focus('nick')}
+                ></TextInput>
+                <TouchableOpacity  onPress={() => { this._editNick() }} style={styles.iconEdit} ><FontAwesomeIcon icon={ faEdit } /></TouchableOpacity>
+            </View>
+        </View>
+            <View style={styles.containerOptions}>
+            <ScrollView>
+                <Text style={styles.title}>USER PROFILE</Text>
+                <Input value={user} type='default' onChange={(user) => this.setState({ user})} textLabel={'User Name'} 
+                holder={'Enter User Name'} icon={faUser} />
+                <Input value={email} type='email-address' onChange={(email) => this.setState({ email})} textLabel={'E-mail'} 
+                holder={'Enter E-mail'} icon={faEnvelope} />
+                <Input value={phoneNumber} type='phone-pad' onChange={(phoneNumber) => this.setState({ phoneNumber})} textLabel={'Mobile Number'} 
+                holder={'Enter your 10 digit mobile number'} 
+                icon={faMobile} />
+                <Input value={date} type='default' onChange={(date) => this.setState({ date})} textLabel={'Date of Birth'} 
+                holder={'DD / MM / YYYY'} 
+                icon={faCalendar} />
+                {/* <DatePicker format="DD/MM/YYYY" mode="date"
+                customStyles={{
+                    dateIcon: {
+                      display: 'none'
+                    }
+                  }}
+                 /> */}
+            </ScrollView>
+            </View>
+        </View>
+        </>
+    )
+}
 }
